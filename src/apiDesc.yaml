@@ -1,0 +1,181 @@
+openapi: 3.0.1
+info:
+  title: Tripvago API
+  description: Accomodation Reservation
+  version: 0.0.1
+servers:
+  - url: http://localhost:3001
+    description: Local server
+tags:
+  - name: accomodation
+    description: accomodation operations
+
+paths:
+  /test:
+    get:
+      tags:
+        - test
+      summary: this is the test endpoint
+      description: this is only a test
+      responses:
+        '200':
+          description: connected to the endpoint
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /accomodation:
+    get:
+      tags:
+        - accomodation
+      summary: List of accomodation
+      description: returns the full list of accomodation 
+      responses:
+        '200': # status code
+          description: list successfully fetched!
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Accomodation'
+        '500':
+          $ref: '#/components/responses/GenericServerError'
+    post:
+      tags:
+        - accomodation
+      summary: add new accomodation
+      description: let users add new accomodation
+      requestBody:
+        description: new accomodation details
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Accomodation'
+      responses:
+        '201':
+          description: accomodation added!
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Accomodation'
+  
+  /accomodation/{id}:
+    get:
+      tags:
+        - accomodation
+      summary: selected accomodation
+      description: return details of an existing selected accomodation
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: Unique ID from an accomodation
+      responses:
+        '200': # status code
+          description: accomodation details fetched!
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Accomodation'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+        - accomodation
+      description: Update an existing accomodation
+      summary: Update accomodation
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: Unique ID of the accomodation to update
+      requestBody:
+        description: Fields to update
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Accomodation"
+      responses:
+        "200": # status code
+          description: A list of product
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Accomodation"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+    delete:
+      tags:
+        - accomodation
+      description: remove an accomodation
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: Unique ID of the going-to-be-removed accomodation
+      responses:
+        '204': # status code
+          description: accomodation removed!
+        '404': # status code
+          $ref: '#/components/responses/NotFound'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+components:
+  responses:
+    NotFound:
+      description: The specific resource was not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    BadRequest:
+      description: Some problems with your request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Bearer token missing or invalid
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    GenericServerError:
+      description: A problem on the server occurred
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  schemas:
+    Accomodation:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        maxGuest:
+          type: number
+        city:
+          type: string
+
+    Error:
+      type: object
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
